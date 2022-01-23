@@ -1,0 +1,12 @@
+"0","dat %>% "
+"0","  filter(state_abbreviation == ""NY"" & control_of_institution == ""Public"") %>% "
+"0","  group_by(highest_degree_offered, fyear) %>% "
+"0","  summarise(n_instituions = n(),"
+"0","    total_circ = sum(total_library_circulations_physical_and_digital_electronic, na.rm = TRUE),"
+"0","            total_phys_circ = sum(total_physical_library_circulations_books_and_media, na.rm = TRUE),"
+"0","            total_dig_circ = sum(total_digital_electronic_circulations_books_and_media, na.rm = TRUE)) %>%"
+"0","  ggplot(aes(x = fyear, y = total_circ, color = highest_degree_offered)) +"
+"0","  geom_line() +"
+"0","  xlab(""fiscal year"") + ylab(""circulation"")"
+"1","`summarise()` has grouped output by 'highest_degree_offered'. You can override using the `.groups` argument.
+"

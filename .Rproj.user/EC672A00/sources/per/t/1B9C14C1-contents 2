@@ -1,0 +1,128 @@
+---
+title: "Untitled"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+
+dat <- read_csv("../data/processed/IPEDS.csv")
+
+# Build averages. I'll be using a tidyverse approach for this, first nationally, 
+# then regionally, and finally by state
+
+# National averages by year, type of institution, highest degree offered, 
+# geographic location, and size
+
+national_dat <- dat %>% 
+  group_by(fyear, sector_of_institution, institutional_category,
+           degree_of_urbanization_urban_centric_locale, institution_size_category,
+           institution_has_hospital, institution_grants_a_medical_degree) %>% 
+  mutate(avg_physical_coll_by_institution_characteristics = mean(total_physical_library_collections_books_media_and_serials, na.rm = TRUE),
+         avg_digital_collections_by_institution_characteristics = mean(total_electronic_library_collections_books_databases_media_and_serials, na.rm = TRUE),
+         avg_physical_circ_by_institution_characteristics = mean(total_physical_library_circulations_books_and_media, na.rm = TRUE),
+         avg_digital_circ_by_institution_characteristics = mean(total_digital_electronic_circulations_books_and_media, na.rm = TRUE),
+         avg_library_fte = mean(librarians_curators_and_archivists_fte, na.rm = TRUE),
+         avg_salaries = mean(total_salaries_and_wages_from_the_library_budget, na.rm = TRUE),
+         avg_materials_budget = mean(total_materials_services_expenditures, na.rm = TRUE),
+         avg_operations_budget = mean(total_operations_and_maintenance_expenditures, na.rm = TRUE),
+         avg_total_budget = mean(total_expenditures_salaries_wages_benefits_materials_services_and_operations_maintenance, na.rm = TRUE)
+         )
+
+# Regional comparisons - just add bureau_of_economic_analysis_regions to the group_by
+regional_dat <- dat %>% 
+  group_by(fyear, bureau_of_economic_analysis_regions,sector_of_institution, 
+           institutional_category, degree_of_urbanization_urban_centric_locale, 
+           institution_size_category, institution_has_hospital, 
+           institution_grants_a_medical_degree) %>% 
+  mutate(avg_physical_coll_by_institution_characteristics = mean(total_physical_library_collections_books_media_and_serials, na.rm = TRUE),
+         avg_digital_collections_by_institution_characteristics = mean(total_electronic_library_collections_books_databases_media_and_serials, na.rm = TRUE),
+         avg_physical_circ_by_institution_characteristics = mean(total_physical_library_circulations_books_and_media, na.rm = TRUE),
+         avg_digial_circ_by_institution_characteristics = mean(total_digital_electronic_circulations_books_and_media, na.rm = TRUE),
+         avg_library_fte = mean(librarians_curators_and_archivists_fte, na.rm = TRUE),
+         avg_salaries = mean(total_salaries_and_wages_from_the_library_budget, na.rm = TRUE),
+         avg_materials_budget = mean(total_materials_services_expenditures, na.rm = TRUE),
+         avg_operations_budget = mean(total_operations_and_maintenance_expenditures, na.rm = TRUE),
+         avg_total_budget = mean(total_expenditures_salaries_wages_benefits_materials_services_and_operations_maintenance, na.rm = TRUE)
+         )
+
+```
+
+## Circulation by institution type and type of material
+
+```{r echo = FALSE}
+dat %>% 
+  group_by(fyear, control_of_institution) %>% 
+  summarise(avg_total_circ = mean(total_library_circulations_physical_and_digital_electronic, na.rm = TRUE),
+            avg_phys_circ = mean(total_physical_library_circulations_books_and_media, na.rm = TRUE),
+            avg_digital_circ = mean(total_digital_electronic_circulations_books_and_media, na.rm = TRUE)) %>% 
+  ggplot(aes(x = fyear)) +
+  geom_col(aes(y = avg_total_circ)) +
+  geom_line(aes(y = avg_phys_circ), color = "red") +
+  geom_line(aes(y = avg_digital_circ), color = "blue") +
+  facet_wrap(~ control_of_institution)
+```
+
+---
+
+## Counts in NY
+
+```{r echo = FALSE}
+dat %>% 
+  filter(state_abbreviation == "NY") %>% 
+  group_by(control_of_institution) %>% 
+  summarise(NY_n = n(),
+            avg_library_fte = mean(librarians_curators_and_archivists_fte, na.rm = TRUE),
+            avg_physical_collection = mean(total_physical_library_collections_books_media_and_serials, na.rm = TRUE),
+            avg_digital_collection = mean(total_electronic_library_collections_books_databases_media_and_serials, na.rm = TRUE),
+            avg_salaries = mean(total_salaries_and_wages_from_the_library_budget))
+
+dat %>% 
+  filter(state_abbreviation == "NY") %>% 
+  ggplot(aes(x = degree_of_urbanization_urban_centric_locale)) +
+  geom_bar(aes(fill = control_of_institution)) +
+  coord_flip()
+```
+
+## Playing with geom_smooth in NY
+
+```{r echo = FALSE}
+dat %>% 
+  filter(state_abbreviation == "NY") %>% 
+  ggplot(aes(x = librarians_curators_and_archivists_fte, y = total_physical_library_circulations_books_and_media, color = control_of_institution)) +
+  geom_smooth() 
+```
+
+## Rutgers University-New Brunswick, national comparisons
+
+```{r echo = FALSE}
+national_dat %>% 
+  filter(institution_name == "Rutgers University-New Brunswick") %>% 
+  ggplot(aes(x = fyear)) +
+  geom_line(aes(y = total_physical_library_circulations_books_and_media), color = "red") +
+  geom_line(aes(y = avg_physical_circ_by_institution_characteristics), color = "black")
+
+national_dat %>% 
+  filter(institution_name == "Rutgers University-New Brunswick") %>% 
+  ggplot(aes(x = fyear)) +
+  geom_line(aes(y = total_digital_electronic_circulations_books_and_media), color = "red") +
+  geom_line(aes(y = avg_digital_circ_by_institution_characteristics), color = "black")
+
+national_dat %>% 
+  filter(institution_name == "Rutgers University-New Brunswick") %>% 
+  group_by(fyear) %>% 
+  mutate(fte_comparison = (librarians_curators_and_archivists_fte-avg_library_fte)/avg_library_fte) %>% 
+  select(fyear, librarians_curators_and_archivists_fte, avg_library_fte, fte_comparison)
+```
+
+# Hofstra University, regional comparisons
+
+```{r echo = FALSE}
+regional_dat %>% 
+  filter(institution_name == "Hofstra University") %>% 
+  ggplot(aes(x = fyear)) +
+  geom_col(aes(y = total_salaries_and_wages_from_the_library_budget), fill = "red") +
+  geom_line(aes(y = avg_salaries))
+```

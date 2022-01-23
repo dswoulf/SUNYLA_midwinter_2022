@@ -1,0 +1,8 @@
+"0","dat %>% "
+"0","  filter(fyear == 2020 & !is.na(degree_of_urbanization_urban_centric_locale)) %>% "
+"0","  group_by(degree_of_urbanization_urban_centric_locale) %>% "
+"0","  mutate(count = n()) %>% "
+"0","  ggplot(aes(x = degree_of_urbanization_urban_centric_locale, fill = control_of_institution)) +"
+"0","  geom_bar() +"
+"0","  xlab(""geographic locale"") +"
+"0","  coord_flip()"

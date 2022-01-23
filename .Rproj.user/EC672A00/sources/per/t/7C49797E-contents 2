@@ -1,0 +1,58 @@
+---
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+# Initial setup
+knitr::opts_chunk$set(echo = TRUE)
+
+# Load libraries
+library(xml2) # to parse XML
+library(tidyverse) 
+# a group of libraries that I will use manipulate strings and for the parse_english_nodes function
+
+# Read in DDI codebook and  remove namespace
+ddi <- read_xml("../data/DDI/4194_Cohorte_blessures_scolaires_en_2_5.xml")
+ddi <- xml_ns_strip(ddi)
+
+parse_nodes_for_attr <- function(nodes, attr, value, sep = ", ") {
+  att <- as.vector(xml_attr(nodes, attr))
+  text <- as.vector(xml_text(nodes))
+  return <- data.frame(att = att, text = text)
+  return <- return %>% filter(att == value) # the pipe (%>%) and filter are from tidyverse
+  str_c(return$text, collapse = sep)
+}
+```
+
+```{r, include = FALSE}
+# The following section will gather the citation information for the cover page using
+# functions from xml2. Specifically xml_find_first to go to the desired element and 
+# xml_text to extract the text for single elements. 
+```
+
+# `r xml_text(xml_find_first(ddi, "stdyDscr//citation//titlStmt//titl"))`
+
+## `r xml_text(xml_find_first(ddi, "stdyDscr//citation//titlStmt//parTitl"))`
+
+---
+
+## Abstract
+
+`r parse_nodes_for_attr(xml_find_all(ddi, "//abstract"), "lang", "EN")`
+
+**Keywords:** `r parse_nodes_for_attr(xml_find_all(ddi, "//keyword"), "lang", "EN")`
+
+- **Geography:** `r xml_text(xml_find_all(ddi, "//nation"))`
+- **Geographic unit:** `r xml_text(xml_find_first(ddi, "//geogUnit"))`
+
+
+\newpage
+
+## Data Collection
+
+- Collection Dates: `r parse_nodes_for_attr(xml_find_all(ddi, "//collDate"), "event", "start")`-`r parse_nodes_for_attr(xml_find_all(ddi, "//collDate"), "event", "end")`
+- Data Collector: `r xml_text(xml_find_all(ddi, "//dataCollector"))` 
+- Kind of data: `r parse_nodes_for_attr(xml_find_all(ddi, "//dataKind"), "lang", "EN", " \\par ")`
+- Universe: `r parse_nodes_for_attr(xml_find_all(ddi, "//universe"), "lang", "EN")`
+
+
