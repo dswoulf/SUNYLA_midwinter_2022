@@ -20,8 +20,18 @@ While preparing to publish datasets, I ran into a problem: how can I make inform
 - Jupyter Tutorial (<https://www.tutorialspoint.com/jupyter/index.htm>) 
 
 **Markup languages**
+
 - Markdown cheat sheet (<https://www.markdownguide.org/cheat-sheet/>) 
 - A simple guide to LaTeX – step by step (<https://latex-tutorial.com/tutorials/>) 
 - HTML tutorial (<https://www.w3schools.com/html/>) 
 - CSS Tutorial (<https://www.w3schools.com/css/>) 
 
+## Instructions to produce PDFs in .Rmd files
+
+*Prerequisites*: Have [pandoc](https://pandoc.org/installing.html) and LaTeX installed on your computer. LaTeX can be installed using the tinytex() package in RStudio or by going to <https://www.latex-project.org/get/>.
+
+1. Specify pdf_document in the header
+2. Have xml2 package installed in R. For other formats use the jsonlite package for JSON files or the yaml package for YAML files
+3. Create a new Rmarkdown file in RStudio. 
+4. Load xml2 library using “library(xml2)”. Read in the XML file that’s being converted and access different elements using xml2 functions (https://xml2.r-lib.org/reference/index.html).
+5. Create the document being sure to include the markup. Knit, view the document, make changes and iterate until you’re happy.
