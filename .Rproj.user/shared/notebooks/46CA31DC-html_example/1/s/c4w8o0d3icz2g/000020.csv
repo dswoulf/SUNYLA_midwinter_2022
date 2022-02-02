@@ -1,7 +1,0 @@
-"0","dat %>% "
-"0","  filter(fyear == 2020 & !is.na(control_of_institution)) %>% "
-"0","  group_by(control_of_institution) %>% "
-"0","  mutate(count = n()) %>% "
-"0","  ggplot(aes(x = reorder(control_of_institution, count))) +"
-"0","  geom_bar() +"
-"0","  xlab(""control of institutions"")"

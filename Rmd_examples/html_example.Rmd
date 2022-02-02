@@ -1,5 +1,5 @@
 ---
-title: "SUNYLA example"
+title: "Graph and table examples for IPEDS data"
 output: html_document
 ---
 
@@ -15,16 +15,16 @@ dat <- read_csv("../data/processed/IPEDS.csv")
 
 Creating visualizations/comparisons requires wrangling the data into shape. I'll be using the tidyverrse group of packages to do so. Below are a few functions that I'll be using regularly in this file:
 
-- %>% - the pipe. This combines each step into a single statement. The statement before is piped into the statement after as the data.
-- filter() - This function filters the data based on logical tests like == [equals], != [not equals], is.na() [is a NA value], !is.na [is not a NA value], > [greater than], < [less than]
-- group_by() - This function creates groups based on categorical variables within the dataset. It allows us to group by state, highest degree offered by the institution, institution size, local, etc. It's useful for the next two functions
+- %>% - the pipe. This combines each step into a single statement. The result of the statement to the left or above the pipe is piped into the statement to the right or below.
+- filter() - This function filters the data based on logical tests like == [equals], != [not equals], > [greater than], < [less than]. Functions that provide a logical result like is.na() [is a NA value], !is.na [is not a NA value], can also be used
+- group_by() - This function creates groups based on categorical variables within the dataset. It allows us to group by state, highest degree offered by the institution, institution size, local, etc. It's useful for the next two functions.
 - mutate() - change or add a new variable in the file. This can be used with summary functions like sum(), mean(), median() as well as arithmetic formulas. One other function is n() which provides a count.
-- summarise - instead of adding a new variable, this summarises the dataset based on the groups you've specified and the summary functions/formulas you provide
-- rename() - renames the columns. I'm using it to shorten the variable names
+- summarise() - instead of adding a new variable, this summarises the dataset based on the groups you've specified and the summary functions/formulas like sum(), mean(), median(), n(), etc.
+- rename() - renames the columns. I'm using it to shorten the variable names.
 - ggplot - this is the part of the tidyverse that creates plots and graphs. Each ggplot consists of aes() [aesthetics] which can contain the x values, y values, and other values like color or fill. 
-- geom_??? - this specifies the visualizations
-- arrange - arranges data by a numeric variables by least to greatest. Adding the desc() function will arrange it in descending order
-- head() - lets you pick first x number of rows
+- geom_???() - this specifies the visualizations. It's from the ggplot package
+- arrange() - arranges data by a numeric variables by least to greatest. Adding the desc() function will arrange it in descending order.
+- head() - results in first x number of rows. There's also tail() which results in the last x number of rows.
 
 ## Top five states for academic circulation
 

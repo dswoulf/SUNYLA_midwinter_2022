@@ -12,6 +12,7 @@ While preparing to publish datasets, I ran into a problem: how can I make inform
 
 - R Tutorial (<https://www.w3schools.com/r/>) 
 - R Markdown: The definitive guide (<https://bookdown.org/yihui/rmarkdown/>)
+- R cheatsheets: ggplot, tidyverse, readr, rmarkdown (<https://www.rstudio.com/resources/cheatsheets/>)
 - Useful packages to parse metadata and data: readr, xml2, jsonlite, yaml
 
 **Python and Jupyter Notebook**
