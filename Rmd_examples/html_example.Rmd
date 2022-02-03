@@ -1,5 +1,5 @@
 ---
-title: "Graph and table examples for IPEDS data"
+title: "Finding outliers in NY IPEDS circulation data at public institutions"
 output: html_document
 ---
 
@@ -13,7 +13,9 @@ library(tidyverse)
 dat <- read_csv("../data/processed/IPEDS.csv")
 ```
 
-Creating visualizations/comparisons requires wrangling the data into shape. I'll be using the tidyverrse group of packages to do so. Below are a few functions that I'll be using regularly in this file:
+Finding and isolating outliers for further investigation is an important part of data wrangling and analysis. It requires getting a general idea of the database, including wrangling and shaping data to create visualizations and tables.
+
+I'll be using the tidyverse group of packages to do so. Below are a few functions that I'll be using regularly in this file:
 
 - %>% - the pipe. This combines each step into a single statement. The result of the statement to the left or above the pipe is piped into the statement to the right or below.
 - filter() - This function filters the data based on logical tests like == [equals], != [not equals], > [greater than], < [less than]. Functions that provide a logical result like is.na() [is a NA value], !is.na [is not a NA value], can also be used
@@ -27,6 +29,8 @@ Creating visualizations/comparisons requires wrangling the data into shape. I'll
 - head() - results in first x number of rows. There's also tail() which results in the last x number of rows.
 
 ## Top five states for academic circulation
+
+First, a national view of the circulation data.
 
 ```{r echo = FALSE}
 dat %>% 
@@ -42,7 +46,7 @@ dat %>%
 
 ## NY academic libraries - Bar chart and stacked bar chart example
 
-Below we can see that academic libraries are split somewhat evenly between public institutions and private not-for-profit institutions. There are significantly less private for-profit institutions. 
+Next we'll look at NYS academic libraries. We can see that they are split somewhat evenly between public institutions and private not-for-profit institutions. There are significantly less private for-profit institutions. 
 
 ```{r echo = FALSE}
 dat %>% 
@@ -69,6 +73,8 @@ dat %>%
 
 ## Public academic libraries in NY circulation - Line/Time series example
 
+The below chart now looks at total circulation in public academic libraries by the highest degree they offer. We're summing all instituions rather than getting the average. The masters degree looks a bit suspicious since it's high and then shoots back down.
+
 ```{r echo = FALSE}
 dat %>% 
   filter(state_abbreviation == "NY" & control_of_institution == "Public") %>% 
@@ -84,7 +90,7 @@ dat %>%
 
 ## Looking for outliers - Box plot examples
 
-From above we can see that institutions that have a masters degree as their largest degree see larger circulation. Next lets look for outliers in the data. 
+Since that decrease in circulation for masters degree institutions seems suspicious lets look a little more closely at 2019 and 2020. I'm using a box plot here because it will tell me the median, the quartiles and highlight how many and how far the outliers are to the 2nd and 3rd quartile.
 
 ```{r echo = FALSE}
 dat %>% 
@@ -98,9 +104,13 @@ dat %>%
   xlab("circulation")
 ```
 
+There is definitely multiple outliers in the masters degree granting institutions. 
+
 ---
 
-## Calculating percentages and finding the outliers
+## Calculating percentages and finding the largest outlier
+
+Lets find out what the largest outlier is. This is also an example of using inline R commands within natural language text.
 
 ```{r echo = FALSE}
 # Creating a new variable to show you how to use inline code
@@ -127,11 +137,13 @@ top_masters_inst_2019 <- dat2 %>%
 
 `r top_masters_inst_2020$institution_name` had the highest circulation among the public institutions that offered a Masters degree as its highest degree in 2020 with a circulation of `r format(top_masters_inst_2020$total_circ, scientific = FALSE)`. This was `r round(top_masters_inst_2020$total_circ/top_masters_inst_2020$avg_circ, 5) * 100`% higher than the average circulation for public institutions in this category. 
 
-The previous year, `r top_masters_inst_2019$institution_name` was even higher with a circulation of `r format(top_masters_inst_2019$total_circ, scientific = FALSE)`. This was `r round(top_masters_inst_2019$total_circ/top_masters_inst_2019$avg_circ, 5) * 100`% higher than the average circulation for public institutions in this category. `r top_masters_inst_2019$institution_name` is most likely the largest outlier. 
+The previous year, `r top_masters_inst_2019$institution_name` was even higher with a circulation of `r format(top_masters_inst_2019$total_circ, scientific = FALSE)`. This was `r round(top_masters_inst_2019$total_circ/top_masters_inst_2019$avg_circ, 5) * 100`% higher than the average circulation for public institutions in this category. `r top_masters_inst_2019$institution_name` is most likely the largest outlier in this year. 
 
 ### Pivoting the data and calculating change over time for CUNY John Jay College of Criminal Justice
 
-Below is an example of calculating change over time. In this case, since the data is in a long format (each school has multiple observations based on the year) I'm going to pivot it into a long format so John Jay is a single observation with each variable/year combination is represented by a different row. This will allow me to calculate the change over time. Pivoting is a more advanced data wrangling technique. 
+Below is an example of calculating change over time. In this case, since the data is in a long format (each school has multiple observations based on the year) I'm going to pivot it into a wide format so John Jay is a single observation with each variable/year combination is represented by a different columns This will allow me to calculate the change over time. In this situationm a 0% change is no change, 100% doubles, 200% triples. Pivoting is a more advanced data wrangling technique. 
+
+What I want to see is if this is a one-off outlier or representative of a larger trend.
 
 ```{r echo = FALSE}
 john_jay <- dat %>% 
@@ -146,8 +158,11 @@ john_jay <- dat %>%
          from2019_phys_circ_change = (phys_circ_2020 - phys_circ_2019)/phys_circ_2019)
 ```
 
-| Type of circulation | 2020 | 2019 | change |
+| Type of circulation | 2020 | 2019 | change over time |
 |:--------------------|:-----|:-----|:-------|
 | Total circulation | `r format(john_jay$total_circ_2020, scientific = FALSE)`|`r format(john_jay$total_circ_2019, scientific = FALSE)`|`r round(john_jay$from2019_circ_change, 4) *100`%|
 | Digital circulation | `r format(john_jay$dig_circ_2020, scientific = FALSE)`|`r format(john_jay$dig_circ_2019, scientific = FALSE)`|`r round(john_jay$from2019_dig_circ_change, 4) *100`%|
 | Physical circulation | `r format(john_jay$phys_circ_2020, scientific = FALSE)`|`r format(john_jay$phys_circ_2019, scientific = FALSE)`|`r round(john_jay$from2019_phys_circ_change, 4) *100`%|
+
+It clearly seems like a one-off change in the digital circulation so John Jay may not be a repeat outlier. 
+
