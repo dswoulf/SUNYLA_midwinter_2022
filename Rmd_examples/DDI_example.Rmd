@@ -1,5 +1,6 @@
 ---
-output: pdf_document
+output:
+  pdf_document
 ---
 
 ```{r setup, include=FALSE}
@@ -120,4 +121,4 @@ Data Collectors: `r xml_text(xml_find_all(ddi, "//dataCollector[1]"))` (`r xml_a
 
 |   |   |
 |---|---|
-|`r parse_nodes_for_attr(xml_find_all(ddi, "//dataKind"), "lang", "EN", "; ")`|`r parse_nodes_for_attr(xml_find_all(ddi, "//dataKind"), "lang", "FR", "; ")`|
+|`r parse_nodes_for_attr(xml_find_all(ddi, "//dataKind"), "lang", "FR", "; ")`|`r parse_nodes_for_attr(xml_find_all(ddi, "//dataKind"), "lang", "EN", "; ")`|
